@@ -75,7 +75,7 @@ async def main():
         json.dump(all_shifts, f, indent=2)
 
     # 5. Generate Map HTML
-    gen = MapGenerator()
+    gen = MapGenerator(output_file='index.html')
     gen.generate()
 
 if __name__ == "__main__":

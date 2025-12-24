@@ -40,5 +40,5 @@ jobs:
         run: |
           git config user.name "Scraper Bot"
           git config user.email "bot@optomcoach.com"
-          git add data/history.json data/geocache.json output/index.html
+          git add data/history.json data/geocache.json index.html
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update shifts data and map [skip ci]" && git push)
