@@ -1,26 +1,37 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>UK Locum Optometry Shifts Heatmap</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
     <!-- MarkerCluster CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        #map { height: 100vh; width: 100vw; }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100vw;
+        }
+
         .info-box {
             padding: 6px 8px;
             font: 14px/16px Arial, Helvetica, sans-serif;
             background: white;
-            background: rgba(255,255,255,0.9);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             position: absolute;
             top: 10px;
@@ -28,51 +39,73 @@
             z-index: 1000;
             max-width: 300px;
         }
-        h4 { margin: 0 0 5px; color: #777; }
-        .shift-popup { font-size: 13px; }
-        .shift-row { border-bottom: 1px solid #eee; padding: 4px 0; }
-        .shift-agency { font-weight: bold; color: #2c3e50; }
-        .shift-rate { color: #27ae60; font-weight: bold; float: right; }
+
+        h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+
+        .shift-popup {
+            font-size: 13px;
+        }
+
+        .shift-row {
+            border-bottom: 1px solid #eee;
+            padding: 4px 0;
+        }
+
+        .shift-agency {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .shift-rate {
+            color: #27ae60;
+            font-weight: bold;
+            float: right;
+        }
     </style>
 </head>
+
 <body>
 
-<div id="map"></div>
-<div class="info-box">
-    <h4>UK Locum Shifts</h4>
-    <div>Last Updated: <span id="last-updated">...</span></div>
-    <div>Total Active Shifts: <span id="total-shifts">...</span></div>
-</div>
+    <div id="map"></div>
+    <div class="info-box">
+        <h4>UK Locum Shifts</h4>
+        <div>Last Updated: <span id="last-updated">...</span></div>
+        <div>Total Active Shifts: <span id="total-shifts">...</span></div>
+    </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<!-- MarkerCluster JS -->
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.js"></script>
 
-<script>
-    // --- DATA INJECTION POINT ---
-    const shiftsData = []; // WILL BE REPLACED BY PYTHON
-    const lastUpdate = "NEVER"; // WILL BE REPLACED BY PYTHON
-    // ----------------------------
+    <script>
+        // --- DATA INJECTION POINT ---
+        const shiftsData = []; // WILL BE REPLACED BY PYTHON
+        const lastUpdate = "NEVER"; // WILL BE REPLACED BY PYTHON
+        // ----------------------------
 
-    document.getElementById('last-updated').innerText = lastUpdate;
-    document.getElementById('total-shifts').innerText = shiftsData.length;
+        document.getElementById('last-updated').innerText = lastUpdate;
+        document.getElementById('total-shifts').innerText = shiftsData.length;
 
-    var map = L.map('map').setView([54.5, -3.5], 6); // Center of UK
+        var map = L.map('map').setView([54.5, -3.5], 6); // Center of UK
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 19
-    }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
 
-    var markers = L.markerClusterGroup();
+        var markers = L.markerClusterGroup();
 
-    shiftsData.forEach(function(shift) {
-        if (shift.lat && shift.lon) {
-            var marker = L.marker([shift.lat, shift.lon]);
-            
-            var popupContent = `<div class="shift-popup">
+        shiftsData.forEach(function (shift) {
+            if (shift.lat && shift.lon) {
+                var marker = L.marker([shift.lat, shift.lon]);
+
+                var popupContent = `<div class="shift-popup">
                 <strong>${shift.location}</strong><br/>
                 <div class="shift-row">
                     <span class="shift-agency">${shift.agency}</span>
@@ -85,13 +118,14 @@
                 </div>
             </div>`;
 
-            marker.bindPopup(popupContent);
-            markers.addLayer(marker);
-        }
-    });
+                marker.bindPopup(popupContent);
+                markers.addLayer(marker);
+            }
+        });
 
-    map.addLayer(markers);
-</script>
+        map.addLayer(markers);
+    </script>
 
 </body>
+
 </html>
