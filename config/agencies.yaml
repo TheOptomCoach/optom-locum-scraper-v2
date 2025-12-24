@@ -1,0 +1,40 @@
+agencies:
+  locatealocum:
+    enabled: true
+    name: "LocateALocum"
+    login_url: "https://locatealocum.com/login"
+    selectors:
+      username: "input[name='email']"
+      password: "input[name='password']"
+      submit: "button[type='submit']"
+      card_container: "//div[descendant::a[contains(@href, '/jobs/')]]"
+
+  locumbell_standard:
+    enabled: true
+    implementation: "locumbell"
+    name: "Locumbell"
+    login_url: "https://www.locumbell.com/login"
+
+  locumbell_ve:
+    enabled: true
+    implementation: "locumbell"
+    name: "Vision Express"
+    login_url: "https://visionexpress.locumbell.com/login"
+
+  locumotive:
+    enabled: true
+    name: "Locumotive"
+    login_url: "https://locumotive.co.uk/login"
+    selectors:
+      username: "input[formcontrolname='email']"
+      password: "input[formcontrolname='password']"
+      submit: "button[type='submit']"
+
+  teamlocum:
+    enabled: true
+    name: "Team Locum"
+    login_url: "https://app.teamlocum.co.uk/login"
+    selectors:
+      username: "input[name='username']" # Assuming standard input name, will verify or make resilient in code if generic
+      password: "input[name='password']"
+      submit: "button[type='submit']"

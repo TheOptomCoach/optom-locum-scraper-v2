@@ -1,0 +1,44 @@
+name: Daily Shift Scrape
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+
+      - name: Run Scrapers
+        env:
+          LOCATE_USER: ${{ secrets.LOCATE_USER }}
+          LOCATE_PASS: ${{ secrets.LOCATE_PASS }}
+          LOCUMB_USER: ${{ secrets.LOCUMB_USER }}
+          LOCUMB_PASS: ${{ secrets.LOCUMB_PASS }}
+          LOCUMOTIVE_USER: ${{ secrets.LOCUMOTIVE_USER }}
+          LOCUMOTIVE_PASS: ${{ secrets.LOCUMOTIVE_PASS }}
+          TEAMLOCUM_USER: ${{ secrets.TEAMLOCUM_USER }}
+          TEAMLOCUM_PASS: ${{ secrets.TEAMLOCUM_PASS }}
+        run: python main.py
+
+      - name: Commit Data
+        run: |
+          git config user.name "Scraper Bot"
+          git config user.email "bot@optomcoach.com"
+          git add data/history.json data/geocache.json output/index.html
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update shifts data and map [skip ci]" && git push)
