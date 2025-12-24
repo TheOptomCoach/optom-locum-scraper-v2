@@ -1,129 +1,305 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>UK Locum Optometry Shifts Heatmap</title>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Leaflet CSS -->
+    <title>UK Locum Optometry Shifts Map</title>
+    <!-- Leaflet CSS with Integrity Hash for Ghost -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-
-    <!-- MarkerCluster CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-
+    <!-- Leaflet JS with Integrity Hash for Ghost -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <style>
-        body {
+        /* Reset and base styles */
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html,
+        body {
+            width: 100%;
+            /* Remove fixed height on body to allow scrolling if needed */
+            height: auto;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Main container panel - FIXED HEIGHT FOR GHOST */
+        #mainPanel {
+            width: 100%;
+            height: 850px;
+            /* Taller fixed height for embed */
+            position: relative;
+            overflow: hidden;
+            /* Keep map contained */
+            border-radius: 8px;
+            /* Slight rounding for embed */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Map container - takes full space */
+        #mapContainer {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
 
         #map {
-            height: 100vh;
-            width: 100vw;
+            width: 100%;
+            height: 100%;
         }
 
-        .info-box {
-            padding: 6px 8px;
-            font: 14px/16px Arial, Helvetica, sans-serif;
-            background: white;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
+        /* Floating Controls Card */
+        #controls {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 20px;
+            right: 20px;
             z-index: 1000;
-            max-width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        h4 {
-            margin: 0 0 5px;
-            color: #777;
+        /* Title in controls */
+        .control-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
         }
 
-        .shift-popup {
-            font-size: 13px;
+        /* Styled Dropdown */
+        #mode {
+            width: 100%;
+            padding: 10px 16px;
+            font-size: 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background-color: #fff;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23374151%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px top 50%;
+            background-size: 10px auto;
         }
 
-        .shift-row {
-            border-bottom: 1px solid #eee;
-            padding: 4px 0;
+        #mode:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        .shift-agency {
-            font-weight: bold;
-            color: #2c3e50;
+        #mode:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
-        .shift-rate {
-            color: #27ae60;
-            font-weight: bold;
-            float: right;
+        /* Status Text */
+        #dataStatus {
+            font-size: 12px;
+            color: #6b7280;
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        /* Ensure Leaflet controls don't overflow */
+        .leaflet-container {
+            overflow: hidden;
+        }
+
+        /* Move zoom controls to bottom right */
+        .leaflet-top.leaflet-left {
+            top: 20px;
+            left: 20px;
         }
     </style>
 </head>
 
 <body>
 
-    <div id="map"></div>
-    <div class="info-box">
-        <h4>UK Locum Shifts</h4>
-        <div>Last Updated: <span id="last-updated">...</span></div>
-        <div>Total Active Shifts: <span id="total-shifts">...</span></div>
+    <div id="mainPanel">
+        <div id="mapContainer">
+            <div id="map"></div>
+        </div>
+
+        <div id="controls">
+            <div class="control-title">Map Settings</div>
+            <select id="mode">
+                <option value="total">Total Pay</option>
+                <option value="Density And Companies">Density And Companies</option>
+                <option value="frequency">Repeat Booking Highlighter</option>
+            </select>
+            <div id="dataStatus">Loading map data...</div>
+        </div>
     </div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <!-- MarkerCluster JS -->
-    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.js"></script>
-
     <script>
-        // --- DATA INJECTION POINT ---
-        const shiftsData = []; // WILL BE REPLACED BY PYTHON
-        const lastUpdate = "NEVER"; // WILL BE REPLACED BY PYTHON
-        // ----------------------------
+        (function () {
+            // Initialize the map
+            let map;
+            let markersLayer;
 
-        document.getElementById('last-updated').innerText = lastUpdate;
-        document.getElementById('total-shifts').innerText = shiftsData.length;
+            const locationsData = []; // WILL BE REPLACED BY PYTHON
+            const lastUpdate = "NEVER"; // WILL BE REPLACED BY PYTHON
 
-        var map = L.map('map').setView([54.5, -3.5], 6); // Center of UK
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
-            maxZoom: 19
-        }).addTo(map);
+            function initMap() {
+                // Create map centered on UK
+                map = L.map('map', {
+                    center: [54.5, -2.5],
+                    zoom: 6,
+                    zoomControl: true,
+                    scrollWheelZoom: true
+                });
 
-        var markers = L.markerClusterGroup();
+                // Add OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(map);
 
-        shiftsData.forEach(function (shift) {
-            if (shift.lat && shift.lon) {
-                var marker = L.marker([shift.lat, shift.lon]);
+                // Create a layer group for markers
+                markersLayer = L.layerGroup().addTo(map);
 
-                var popupContent = `<div class="shift-popup">
-                <strong>${shift.location}</strong><br/>
-                <div class="shift-row">
-                    <span class="shift-agency">${shift.agency}</span>
-                    <span class="shift-rate">${shift.rate}</span>
-                </div>
-                <div>${shift.date} | ${shift.time}</div>
-                <div>${shift.company}</div>
-                <div style="margin-top:5px;">
-                    <a href="${shift.link}" target="_blank" style="background:#3498db;color:white;padding:2px 6px;text-decoration:none;border-radius:3px;font-size:11px;">Book / View</a>
-                </div>
-            </div>`;
-
-                marker.bindPopup(popupContent);
-                markers.addLayer(marker);
+                // Load the embedded data
+                loadEmbeddedData();
             }
-        });
 
-        map.addLayer(markers);
+            function loadEmbeddedData() {
+                // Check if locationsData is defined (injected)
+                if (typeof locationsData !== 'undefined' && locationsData.length > 0) {
+                    updateMap(locationsData);
+                    document.getElementById('dataStatus').textContent =
+                        `Loaded ${locationsData.length} locations`;
+                } else {
+                    document.getElementById('dataStatus').textContent = 'No data found';
+                }
+            }
+
+            function updateMap(locations) {
+                markersLayer.clearLayers();
+                const mode = document.getElementById('mode').value;
+
+                if (mode === 'total') {
+                    const colorMap = {
+                        green: "0, 128, 0",
+                        orange: "255, 165, 0",
+                        red: "255, 0, 0"
+                    };
+
+                    for (const loc of locations) {
+                        for (const shift of loc.shifts) {
+                            const colorName = shift.total >= 400 ? "green" : shift.total >= 325 ? "orange" : "red";
+                            const rgb = colorMap[colorName];
+                            const markerDiameter = 30;
+
+                            const gradientIcon = L.divIcon({
+                                className: 'custom-gradient-icon',
+                                html: `<div style="background: radial-gradient(circle, rgba(${rgb}, 1) 0%, rgba(${rgb}, 0) 50%); width: 100%; height: 100%; border-radius: 50%;"></div>`,
+                                iconSize: [markerDiameter, markerDiameter],
+                                iconAnchor: [markerDiameter / 2, markerDiameter / 2]
+                            });
+
+                            const marker = L.marker([loc.lat, loc.lon], {
+                                icon: gradientIcon
+                            }).bindPopup(`<b>${loc.name}</b><br>Total Pay: £${shift.total.toFixed(2)}<br>Company: ${shift.company}`);
+
+                            markersLayer.addLayer(marker);
+                        }
+                    }
+                } else if (mode === 'Density And Companies') {
+                    for (const loc of locations) {
+                        let markerColor = "#7F8C8D";
+                        if (loc.companies.includes('Specsavers')) {
+                            markerColor = "#006A4E";
+                        } else if (loc.companies.includes('Boots Opticians')) {
+                            markerColor = "#005EB8";
+                        } else if (loc.companies.includes('Vision Express')) {
+                            markerColor = "#6A0DAD";
+                        } else if (loc.companies.includes('Asda')) {
+                            markerColor = "#78BE20";
+                        }
+
+                        const svgIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="marker">
+          <path fill-opacity=".25" d="M16 32s1.427-9.585 3.761-12.025c4.595-4.805 8.685-.99 8.685-.99s4.044 3.964-.526 8.743C25.514 30.245 16 32 16 32z"/>
+          <path fill="${markerColor}" stroke="#fff" d="M15.938 32S6 17.938 6 12C6 6.477 10.477 2 16 2s10 4.477 10 10c0 5.938-9.938 20-9.938 20zM16 16a4 4 0 110-8 4 4 0 010 8z"/>
+        </svg>`;
+
+                        const customIcon = L.divIcon({
+                            html: svgIcon,
+                            className: "",
+                            iconSize: [22, 22],
+                            iconAnchor: [13, 13],
+                            popupAnchor: [0, -5]
+                        });
+
+                        const marker = L.marker([loc.lat, loc.lon], { icon: customIcon })
+                            .bindPopup(`<b>${loc.name}</b><br>Companies: ${loc.companies.join(", ")}<br>Available Shifts: ${loc.count}`);
+
+                        markersLayer.addLayer(marker);
+                    }
+                } else if (mode === 'frequency') {
+                    for (const loc of locations) {
+                        let color, radius, fillOpacity;
+
+                        if (loc.count >= 3) {
+                            color = "green";
+                            radius = 8 + Math.log(loc.count);
+                            fillOpacity = 0.5;
+                        } else {
+                            color = "White";
+                            radius = 1;
+                            fillOpacity = 0.1;
+                        }
+
+                        const marker = L.circleMarker([loc.lat, loc.lon], {
+                            radius: radius,
+                            color: color,
+                            fillOpacity: fillOpacity
+                        }).bindPopup(`<b>${loc.name}</b><br>Companies: ${loc.companies.join(", ")}<br>Available Shifts: ${loc.count}`);
+                        markersLayer.addLayer(marker);
+                    }
+                }
+            }
+
+            // Event listener for mode changes
+            document.getElementById('mode').addEventListener('change', function () {
+                if (typeof locationsData !== 'undefined' && locationsData.length > 0) {
+                    updateMap(locationsData);
+                }
+            });
+
+            // Initialize map when page loads
+            document.addEventListener('DOMContentLoaded', initMap);
+
+            // Handle window resize
+            window.addEventListener('resize', function () {
+                if (map) {
+                    map.invalidateSize();
+                }
+            });
+        })();
     </script>
 
 </body>

@@ -41,19 +41,6 @@
   {
     "agency": "LocateALocum",
     "company": "Unknown Agency",
-    "location": "Widnes",
-    "postcode": "",
-    "date": "Sat 27 Dec 2025",
-    "time": "9:00 AM - 11:30 AM",
-    "rate": "\u00a335.00/hr",
-    "total": "87.50",
-    "lat": 53.3646888,
-    "lon": -2.7283328,
-    "link": "https://locatealocum.com/login?returnUrl=/jobs/16683509"
-  },
-  {
-    "agency": "LocateALocum",
-    "company": "Unknown Agency",
     "location": "Warrington",
     "postcode": "",
     "date": "Wed 31 Dec 2025",
@@ -63,6 +50,19 @@
     "lat": 53.4018582,
     "lon": -2.5680224,
     "link": "https://locatealocum.com/login?returnUrl=/jobs/13091415"
+  },
+  {
+    "agency": "LocateALocum",
+    "company": "Unknown Agency",
+    "location": "Widnes",
+    "postcode": "",
+    "date": "Sat 27 Dec 2025",
+    "time": "9:00 AM - 11:30 AM",
+    "rate": "\u00a335.00/hr",
+    "total": "87.50",
+    "lat": 53.3646888,
+    "lon": -2.7283328,
+    "link": "https://locatealocum.com/login?returnUrl=/jobs/16683509"
   },
   {
     "agency": "LocateALocum",
@@ -119,19 +119,6 @@
   {
     "agency": "LocateALocum",
     "company": "Unknown Agency",
-    "location": "Regency Way",
-    "postcode": "",
-    "date": "Tue 30 Dec 2025",
-    "time": "8:30 AM - 6:30 PM",
-    "rate": "\u00a330.00/hr",
-    "total": "300.00",
-    "lat": 51.4597357,
-    "lon": 0.1290299,
-    "link": "https://locatealocum.com/login?returnUrl=/jobs/16804874"
-  },
-  {
-    "agency": "LocateALocum",
-    "company": "Unknown Agency",
     "location": "Mossley",
     "postcode": "",
     "date": "Sat 17 Jan 2026",
@@ -154,5 +141,18 @@
     "lat": 53.3556014,
     "lon": -2.5774257,
     "link": "https://locatealocum.com/login?returnUrl=/jobs/16478288"
+  },
+  {
+    "agency": "LocateALocum",
+    "company": "Unknown Agency",
+    "location": "Liverpool",
+    "postcode": "",
+    "date": "Sun 04 Jan 2026",
+    "time": "10:30 AM - 4:30 PM",
+    "rate": "\u00a329.00/hr",
+    "total": "174.00",
+    "lat": 53.4071991,
+    "lon": -2.99168,
+    "link": "https://locatealocum.com/login?returnUrl=/jobs/15322588"
   }
 ]
