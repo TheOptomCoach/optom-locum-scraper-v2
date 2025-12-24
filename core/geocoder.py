@@ -1,10 +1,15 @@
 import pgeocode
 import json
 import os
+import time
+from geopy.geocoders import Nominatim
+from geopy.exc import GeopyError
 
 class UKGeocoder:
     def __init__(self, cache_file='data/geocache.json'):
         self.nomi = pgeocode.Nominatim('gb')
+        # Initialize geopy for town name lookups
+        self.geolocator = Nominatim(user_agent="optom_locum_scraper_v2")
         self.cache_file = cache_file
         self.cache = self._load_cache()
 
@@ -25,32 +30,40 @@ class UKGeocoder:
     def get_lat_lon(self, postcode_or_town):
         """
         Returns (lat, lon) for a given postcode or town name.
-        Check's local cache first, then uses pgeocode.
+        Checks local cache first, then pgeocode for postcodes, 
+        then geopy for town names.
         """
+        if not postcode_or_town:
+            return None, None
+
         query = postcode_or_town.upper().strip()
         
         # Check cache
         if query in self.cache:
             return self.cache[query]
 
-        # Try as Postcode first (pgeocode works best with outcode or full postcode)
-        # If it's a full postcode like 'CV1 1FX', pgeocode handles it.
-        # If it's a town like 'Pontypridd', we might need a different approach or rely on pgeocode fuzzy match if available, 
-        # but pgeocode is primarily postal.
-        
-        # Strategy: 
-        # 1. Try exact query
-        data = self.nomi.query_postal_code(query)
-        
-        if not data.empty and str(data.latitude) != 'nan':
-            res = (float(data.latitude), float(data.longitude))
-            self.cache[query] = res
-            self._save_cache()
-            return res
+        # 1. Try as Postcode first (pgeocode)
+        # We only try this if it looks like a postcode (contains a digit)
+        if any(char.isdigit() for char in query):
+            data = self.nomi.query_postal_code(query)
+            if not data.empty and str(data.latitude) != 'nan':
+                res = (float(data.latitude), float(data.longitude))
+                self.cache[query] = res
+                self._save_cache()
+                return res
 
-        # 2. If it failed, it might be a town name. 
-        # pgeocode is strictly postal. For town names, we might technically need an external API if we want perfect accuracy,
-        # but for now we will return None. The scraper logic handles the 'Town' fallback by geocoding manually later
-        # or we could add a small hardcoded map for major cities if needed.
+        # 2. If it failed or is likely a town name, use geopy (Nominatim)
+        try:
+            # We add ", UK" to the query to make it more specific
+            location = self.geolocator.geocode(f"{postcode_or_town}, UK")
+            if location:
+                res = (location.latitude, location.longitude)
+                self.cache[query] = res
+                self._save_cache()
+                # Nominatim requires a 1s delay per request (we are cached so it's rare)
+                time.sleep(1)
+                return res
+        except GeopyError:
+            pass
         
         return None, None
