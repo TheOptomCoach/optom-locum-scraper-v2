@@ -36,7 +36,9 @@ class MapGenerator:
         html = html.replace('const lastUpdate = "NEVER";', f'const lastUpdate = "{timestamp}";')
 
         # 4. Write Output
-        os.makedirs(os.path.dirname(self.output_file), exist_ok=True)
+        output_dir = os.path.dirname(self.output_file)
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
         with open(self.output_file, 'w') as f:
             f.write(html)
         
