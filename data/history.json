@@ -15,19 +15,6 @@
   {
     "agency": "LocateALocum",
     "company": "Unknown Agency",
-    "location": "Chapel-en-le-Frith",
-    "postcode": "",
-    "date": "Sat 27 Dec 2025",
-    "time": "9:00 AM - 1:00 PM",
-    "rate": "\u00a340.00/hr",
-    "total": "160.00",
-    "lat": 53.3232509,
-    "lon": -1.9148352,
-    "link": "https://locatealocum.com/login?returnUrl=/jobs/15746468"
-  },
-  {
-    "agency": "LocateALocum",
-    "company": "Unknown Agency",
     "location": "Derbyshire",
     "postcode": "",
     "date": "Thu 01 Jan 2026",
@@ -119,19 +106,6 @@
   {
     "agency": "LocateALocum",
     "company": "Unknown Agency",
-    "location": "Liverpool",
-    "postcode": "",
-    "date": "Sun 04 Jan 2026",
-    "time": "10:30 AM - 4:30 PM",
-    "rate": "\u00a329.00/hr",
-    "total": "174.00",
-    "lat": 53.4071991,
-    "lon": -2.99168,
-    "link": "https://locatealocum.com/login?returnUrl=/jobs/15322588"
-  },
-  {
-    "agency": "LocateALocum",
-    "company": "Unknown Agency",
     "location": "Appleton",
     "postcode": "",
     "date": "Fri 02 Jan 2026",
@@ -154,5 +128,31 @@
     "lat": 53.3421509,
     "lon": -2.7334941,
     "link": "https://locatealocum.com/login?returnUrl=/jobs/16749694"
+  },
+  {
+    "agency": "LocateALocum",
+    "company": "Unknown Agency",
+    "location": "Liverpool",
+    "postcode": "",
+    "date": "Sun 04 Jan 2026",
+    "time": "10:30 AM - 4:30 PM",
+    "rate": "\u00a329.00/hr",
+    "total": "174.00",
+    "lat": 53.4071991,
+    "lon": -2.99168,
+    "link": "https://locatealocum.com/login?returnUrl=/jobs/15322588"
+  },
+  {
+    "agency": "LocateALocum",
+    "company": "Unknown Agency",
+    "location": "Lancashire",
+    "postcode": "",
+    "date": "Fri 02 Jan 2026",
+    "time": "8:30 AM - 2:00 PM",
+    "rate": "\u00a328.00/hr",
+    "total": "154.00",
+    "lat": 53.8611712,
+    "lon": -2.5650945,
+    "link": "https://locatealocum.com/login?returnUrl=/jobs/16168970"
   }
 ]
